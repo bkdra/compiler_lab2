@@ -4,10 +4,7 @@
 
 int main()
 {
-    char *line = "/*abc\n123\nefg*/";
-    
-    char *test = strdup(line);
-    line++;
-    printf("test: %s\n", test);
-
+    char test[100] = "";
+    if(!strlen(test))
+    printf("length: %d\n", strlen(test));
 }

@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+#ifndef YY_YY_B113040047_TAB_H_INCLUDED
+# define YY_YY_B113040047_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -124,88 +124,10 @@ extern int yydebug;
     ID_TOK = 325,                  /* ID_TOK  */
     ABSTRACT = 326,                /* ABSTRACT  */
     DOT = 327,                     /* DOT  */
-    READ = 328,                    /* READ  */
-    CHAR = 329                     /* CHAR  */
+    READ = 328                     /* READ  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define ADD 258
-#define INC 259
-#define MINUS 260
-#define DEC 261
-#define MUL 262
-#define DIV 263
-#define MOD 264
-#define AND 265
-#define OR 266
-#define NOT 267
-#define EQ 268
-#define NE 269
-#define LT 270
-#define LE 271
-#define GT 272
-#define GE 273
-#define ASSIGN 274
-#define BOOL 275
-#define BREAK 276
-#define BUTE 277
-#define CASE 278
-#define CATCH 279
-#define CLASS 280
-#define CONST 281
-#define CONTINUE 282
-#define DEFAULT 283
-#define DO 284
-#define DOUBLE 285
-#define ELSE 286
-#define EXTENDS 287
-#define FALSE 288
-#define FINAL 289
-#define FINALLY 290
-#define FLOAT 291
-#define FOR 292
-#define IF 293
-#define IMPLEMENTS 294
-#define INT 295
-#define LONG 296
-#define MAIN 297
-#define NEW 298
-#define PRINT 299
-#define PRIVATE 300
-#define PROTECTED 301
-#define PUBLIC 302
-#define RETURN 303
-#define SHORT 304
-#define STATIC 305
-#define STRING 306
-#define SWITCH 307
-#define THIS 308
-#define TRUE 309
-#define TRY 310
-#define VOID 311
-#define WHILE 312
-#define COMMA 313
-#define COLON 314
-#define SEMICOLON 315
-#define LPAREN 316
-#define RPAREN 317
-#define LBRACKET 318
-#define RBRACKET 319
-#define LBRACE 320
-#define RBRACE 321
-#define INT_LIT 322
-#define FLOAT_LIT 323
-#define STRING_LIT 324
-#define ID_TOK 325
-#define ABSTRACT 326
-#define DOT 327
-#define READ 328
-#define CHAR 329
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -216,7 +138,7 @@ union YYSTYPE
     float floatVal;
     int intVal;
 
-#line 220 "y.tab.h"
+#line 142 "B113040047.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -231,4 +153,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_B113040047_TAB_H_INCLUDED  */

@@ -1,0 +1,2913 @@
+Terminals unused in grammar
+
+    MOD
+    AND
+    OR
+    NOT
+    BREAK
+    BUTE
+    CASE
+    CATCH
+    CONST
+    CONTINUE
+    DEFAULT
+    DO
+    DOUBLE
+    FINALLY
+    MAIN
+    SWITCH
+    THIS
+    TRY
+    VOID
+    COLON
+
+
+Grammar
+
+    0 $accept: lines $end
+
+    1 lines: start_structures
+
+    2 start_structures: ε
+    3                 | start_structure start_structures
+
+    4 start_structure: class_declaration
+
+    5 variable_declaration: STATIC type id_list SEMICOLON
+    6                     | type id_list SEMICOLON
+    7                     | type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+    8                     | FINAL type id_list_const SEMICOLON
+
+    9 type: INT
+   10     | FLOAT
+   11     | BOOL
+   12     | STRING
+   13     | SHORT
+   14     | LONG
+
+   15 id_item: ID_TOK
+   16        | ID_TOK ASSIGN const_expr
+
+   17 id_list: id_item
+   18        | id_list COMMA id_item
+
+   19 id_list_const: ID_TOK ASSIGN const_expr
+   20              | id_list_const COMMA ID_TOK ASSIGN const_expr
+
+   21 const_expr: INT_LIT
+   22           | FLOAT_LIT
+   23           | STRING_LIT
+   24           | TRUE
+   25           | FALSE
+
+   26 class_declaration: class_modifier CLASS ID_TOK super interface class_body
+
+   27 class_modifier: ε
+   28               | PUBLIC
+   29               | ABSTRACT
+   30               | FINAL
+
+   31 super: ε
+   32      | EXTENDS ID_TOK
+
+   33 interface: ε
+   34          | IMPLEMENTS interface_type_list
+
+   35 interface_type_list: ID_TOK
+   36                    | interface_type_list COMMA ID_TOK
+
+   37 class_body: LBRACE class_body_declaration RBRACE
+
+   38 class_body_declaration: fields
+   39                       | method
+   40                       | fields class_body_declaration
+   41                       | method class_body_declaration
+
+   42 fields: class_fields
+   43       | instance_fields
+
+   44 class_fields: STATIC type id_list SEMICOLON
+
+   45 instance_fields: type id_list SEMICOLON
+   46                | FINAL type id_list_const SEMICOLON
+   47                | type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+   48 method: method_modifier type ID_TOK LPAREN formal_arguments RPAREN compound_statement
+
+   49 method_modifier: PUBLIC
+   50                | PROTECTED
+   51                | PRIVATE
+
+   52 formal_arguments: ε
+   53                 | param_list
+
+   54 param_list: type ID_TOK
+   55           | param_list COMMA type ID_TOK
+
+   56 statement: compound_statement
+   57          | simple_statement
+   58          | conditional_statement
+   59          | loop_statement
+   60          | return_statement
+
+   61 compound_statement: LBRACE compound_statement_body RBRACE
+
+   62 compound_statement_body: ε
+   63                        | variable_declaration compound_statement_body
+   64                        | statement compound_statement_body
+
+   65 simple_statement: name ASSIGN expression SEMICOLON
+   66                 | PRINT LPAREN expression RPAREN SEMICOLON
+   67                 | READ LPAREN name RPAREN SEMICOLON
+   68                 | expression SEMICOLON
+   69                 | SEMICOLON
+
+   70 name: ID_TOK
+   71     | ID_TOK DOT ID_TOK
+
+   72 expression: term
+   73           | expression ADD term
+   74           | expression MINUS term
+
+   75 term: factor
+   76     | term MUL factor
+   77     | term DIV factor
+
+   78 factor: ID_TOK
+   79       | const_expr
+   80       | LPAREN expression RPAREN
+   81       | prefixOP ID_TOK
+   82       | ID_TOK postfixOP
+   83       | method_invocation
+
+   84 prefixOP: INC
+   85         | DEC
+   86         | ADD
+   87         | MINUS
+
+   88 postfixOP: INC
+   89          | DEC
+
+   90 method_invocation: name LPAREN arguments RPAREN
+
+   91 arguments: ε
+   92          | arg_list
+
+   93 arg_list: expression
+   94         | arg_list COMMA expression
+
+   95 conditional_statement: IF LPAREN boolean_expr RPAREN if_else_loop_statement
+   96                      | IF LPAREN boolean_expr RPAREN if_else_loop_statement else
+
+   97 else: ELSE if_else_loop_statement
+
+   98 boolean_expr: expression infixOP expression
+
+   99 infixOP: EQ
+  100        | NE
+  101        | LT
+  102        | LE
+  103        | GT
+  104        | GE
+
+  105 if_else_loop_statement: simple_statement
+  106                       | compound_statement
+
+  107 loop_statement: while
+  108               | for
+
+  109 while: WHILE LPAREN boolean_expr RPAREN if_else_loop_statement
+
+  110 for: FOR LPAREN forInitOpt SEMICOLON boolean_expr SEMICOLON forUpdateOpt RPAREN if_else_loop_statement
+
+  111 forInitOpt: ε
+  112           | init_list
+
+  113 init_item: ID_TOK ASSIGN expression
+  114          | INT ID_TOK ASSIGN expression
+
+  115 init_list: init_item
+  116          | init_list COMMA init_item
+
+  117 forUpdateOpt: ID_TOK INC
+  118             | ID_TOK DEC
+
+  119 return_statement: RETURN expression SEMICOLON
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    ADD (258) 73 86
+    INC (259) 84 88 117
+    MINUS (260) 74 87
+    DEC (261) 85 89 118
+    MUL (262) 76
+    DIV (263) 77
+    MOD (264)
+    AND (265)
+    OR (266)
+    NOT (267)
+    EQ (268) 99
+    NE (269) 100
+    LT (270) 101
+    LE (271) 102
+    GT (272) 103
+    GE (273) 104
+    ASSIGN (274) 7 16 19 20 47 65 113 114
+    BOOL (275) 11
+    BREAK (276)
+    BUTE (277)
+    CASE (278)
+    CATCH (279)
+    CLASS (280) 26
+    CONST (281)
+    CONTINUE (282)
+    DEFAULT (283)
+    DO (284)
+    DOUBLE (285)
+    ELSE (286) 97
+    EXTENDS (287) 32
+    FALSE (288) 25
+    FINAL (289) 8 30 46
+    FINALLY (290)
+    FLOAT (291) 10
+    FOR (292) 110
+    IF (293) 95 96
+    IMPLEMENTS (294) 34
+    INT (295) 9 114
+    LONG (296) 14
+    MAIN (297)
+    NEW (298) 7 47
+    PRINT (299) 66
+    PRIVATE (300) 51
+    PROTECTED (301) 50
+    PUBLIC (302) 28 49
+    RETURN (303) 119
+    SHORT (304) 13
+    STATIC (305) 5 44
+    STRING (306) 12
+    SWITCH (307)
+    THIS (308)
+    TRUE (309) 24
+    TRY (310)
+    VOID (311)
+    WHILE (312) 109
+    COMMA (313) 18 20 36 55 94 116
+    COLON (314)
+    SEMICOLON (315) 5 6 7 8 44 45 46 47 65 66 67 68 69 110 119
+    LPAREN (316) 48 66 67 80 90 95 96 109 110
+    RPAREN (317) 48 66 67 80 90 95 96 109 110
+    LBRACKET (318) 7 47
+    RBRACKET (319) 7 47
+    LBRACE (320) 37 61
+    RBRACE (321) 37 61
+    INT_LIT (322) 7 21 47
+    FLOAT_LIT (323) 22
+    STRING_LIT (324) 23
+    ID_TOK (325) 7 15 16 19 20 26 32 35 36 47 48 54 55 70 71 78 81 82 113 114 117 118
+    ABSTRACT (326) 29
+    DOT (327) 71
+    READ (328) 67
+
+
+Nonterminals, with rules where they appear
+
+    $accept (74)
+        on left: 0
+    lines (75)
+        on left: 1
+        on right: 0
+    start_structures (76)
+        on left: 2 3
+        on right: 1 3
+    start_structure (77)
+        on left: 4
+        on right: 3
+    variable_declaration (78)
+        on left: 5 6 7 8
+        on right: 63
+    type (79)
+        on left: 9 10 11 12 13 14
+        on right: 5 6 7 8 44 45 46 47 48 54 55
+    id_item (80)
+        on left: 15 16
+        on right: 17 18
+    id_list (81)
+        on left: 17 18
+        on right: 5 6 18 44 45
+    id_list_const (82)
+        on left: 19 20
+        on right: 8 20 46
+    const_expr (83)
+        on left: 21 22 23 24 25
+        on right: 16 19 20 79
+    class_declaration (84)
+        on left: 26
+        on right: 4
+    class_modifier (85)
+        on left: 27 28 29 30
+        on right: 26
+    super (86)
+        on left: 31 32
+        on right: 26
+    interface (87)
+        on left: 33 34
+        on right: 26
+    interface_type_list (88)
+        on left: 35 36
+        on right: 34 36
+    class_body (89)
+        on left: 37
+        on right: 26
+    class_body_declaration (90)
+        on left: 38 39 40 41
+        on right: 37 40 41
+    fields (91)
+        on left: 42 43
+        on right: 38 40
+    class_fields (92)
+        on left: 44
+        on right: 42
+    instance_fields (93)
+        on left: 45 46 47
+        on right: 43
+    method (94)
+        on left: 48
+        on right: 39 41
+    method_modifier (95)
+        on left: 49 50 51
+        on right: 48
+    formal_arguments (96)
+        on left: 52 53
+        on right: 48
+    param_list (97)
+        on left: 54 55
+        on right: 53 55
+    statement (98)
+        on left: 56 57 58 59 60
+        on right: 64
+    compound_statement (99)
+        on left: 61
+        on right: 48 56 106
+    compound_statement_body (100)
+        on left: 62 63 64
+        on right: 61 63 64
+    simple_statement (101)
+        on left: 65 66 67 68 69
+        on right: 57 105
+    name (102)
+        on left: 70 71
+        on right: 65 67 90
+    expression (103)
+        on left: 72 73 74
+        on right: 65 66 68 73 74 80 93 94 98 113 114 119
+    term (104)
+        on left: 75 76 77
+        on right: 72 73 74 76 77
+    factor (105)
+        on left: 78 79 80 81 82 83
+        on right: 75 76 77
+    prefixOP (106)
+        on left: 84 85 86 87
+        on right: 81
+    postfixOP (107)
+        on left: 88 89
+        on right: 82
+    method_invocation (108)
+        on left: 90
+        on right: 83
+    arguments (109)
+        on left: 91 92
+        on right: 90
+    arg_list (110)
+        on left: 93 94
+        on right: 92 94
+    conditional_statement (111)
+        on left: 95 96
+        on right: 58
+    else (112)
+        on left: 97
+        on right: 96
+    boolean_expr (113)
+        on left: 98
+        on right: 95 96 109 110
+    infixOP (114)
+        on left: 99 100 101 102 103 104
+        on right: 98
+    if_else_loop_statement (115)
+        on left: 105 106
+        on right: 95 96 97 109 110
+    loop_statement (116)
+        on left: 107 108
+        on right: 59
+    while (117)
+        on left: 109
+        on right: 107
+    for (118)
+        on left: 110
+        on right: 108
+    forInitOpt (119)
+        on left: 111 112
+        on right: 110
+    init_item (120)
+        on left: 113 114
+        on right: 115 116
+    init_list (121)
+        on left: 115 116
+        on right: 112 116
+    forUpdateOpt (122)
+        on left: 117 118
+        on right: 110
+    return_statement (123)
+        on left: 119
+        on right: 60
+
+
+State 0
+
+    0 $accept: • lines $end
+
+    FINAL     shift, and go to state 1
+    PUBLIC    shift, and go to state 2
+    ABSTRACT  shift, and go to state 3
+
+    CLASS     reduce using rule 27 (class_modifier)
+    $default  reduce using rule 2 (start_structures)
+
+    lines              go to state 4
+    start_structures   go to state 5
+    start_structure    go to state 6
+    class_declaration  go to state 7
+    class_modifier     go to state 8
+
+
+State 1
+
+   30 class_modifier: FINAL •
+
+    $default  reduce using rule 30 (class_modifier)
+
+
+State 2
+
+   28 class_modifier: PUBLIC •
+
+    $default  reduce using rule 28 (class_modifier)
+
+
+State 3
+
+   29 class_modifier: ABSTRACT •
+
+    $default  reduce using rule 29 (class_modifier)
+
+
+State 4
+
+    0 $accept: lines • $end
+
+    $end  shift, and go to state 9
+
+
+State 5
+
+    1 lines: start_structures •
+
+    $default  reduce using rule 1 (lines)
+
+
+State 6
+
+    3 start_structures: start_structure • start_structures
+
+    FINAL     shift, and go to state 1
+    PUBLIC    shift, and go to state 2
+    ABSTRACT  shift, and go to state 3
+
+    CLASS     reduce using rule 27 (class_modifier)
+    $default  reduce using rule 2 (start_structures)
+
+    start_structures   go to state 10
+    start_structure    go to state 6
+    class_declaration  go to state 7
+    class_modifier     go to state 8
+
+
+State 7
+
+    4 start_structure: class_declaration •
+
+    $default  reduce using rule 4 (start_structure)
+
+
+State 8
+
+   26 class_declaration: class_modifier • CLASS ID_TOK super interface class_body
+
+    CLASS  shift, and go to state 11
+
+
+State 9
+
+    0 $accept: lines $end •
+
+    $default  accept
+
+
+State 10
+
+    3 start_structures: start_structure start_structures •
+
+    $default  reduce using rule 3 (start_structures)
+
+
+State 11
+
+   26 class_declaration: class_modifier CLASS • ID_TOK super interface class_body
+
+    ID_TOK  shift, and go to state 12
+
+
+State 12
+
+   26 class_declaration: class_modifier CLASS ID_TOK • super interface class_body
+
+    EXTENDS  shift, and go to state 13
+
+    $default  reduce using rule 31 (super)
+
+    super  go to state 14
+
+
+State 13
+
+   32 super: EXTENDS • ID_TOK
+
+    ID_TOK  shift, and go to state 15
+
+
+State 14
+
+   26 class_declaration: class_modifier CLASS ID_TOK super • interface class_body
+
+    IMPLEMENTS  shift, and go to state 16
+
+    $default  reduce using rule 33 (interface)
+
+    interface  go to state 17
+
+
+State 15
+
+   32 super: EXTENDS ID_TOK •
+
+    $default  reduce using rule 32 (super)
+
+
+State 16
+
+   34 interface: IMPLEMENTS • interface_type_list
+
+    ID_TOK  shift, and go to state 18
+
+    interface_type_list  go to state 19
+
+
+State 17
+
+   26 class_declaration: class_modifier CLASS ID_TOK super interface • class_body
+
+    LBRACE  shift, and go to state 20
+
+    class_body  go to state 21
+
+
+State 18
+
+   35 interface_type_list: ID_TOK •
+
+    $default  reduce using rule 35 (interface_type_list)
+
+
+State 19
+
+   34 interface: IMPLEMENTS interface_type_list •
+   36 interface_type_list: interface_type_list • COMMA ID_TOK
+
+    COMMA  shift, and go to state 22
+
+    $default  reduce using rule 34 (interface)
+
+
+State 20
+
+   37 class_body: LBRACE • class_body_declaration RBRACE
+
+    BOOL       shift, and go to state 23
+    FINAL      shift, and go to state 24
+    FLOAT      shift, and go to state 25
+    INT        shift, and go to state 26
+    LONG       shift, and go to state 27
+    PRIVATE    shift, and go to state 28
+    PROTECTED  shift, and go to state 29
+    PUBLIC     shift, and go to state 30
+    SHORT      shift, and go to state 31
+    STATIC     shift, and go to state 32
+    STRING     shift, and go to state 33
+
+    type                    go to state 34
+    class_body_declaration  go to state 35
+    fields                  go to state 36
+    class_fields            go to state 37
+    instance_fields         go to state 38
+    method                  go to state 39
+    method_modifier         go to state 40
+
+
+State 21
+
+   26 class_declaration: class_modifier CLASS ID_TOK super interface class_body •
+
+    $default  reduce using rule 26 (class_declaration)
+
+
+State 22
+
+   36 interface_type_list: interface_type_list COMMA • ID_TOK
+
+    ID_TOK  shift, and go to state 41
+
+
+State 23
+
+   11 type: BOOL •
+
+    $default  reduce using rule 11 (type)
+
+
+State 24
+
+   46 instance_fields: FINAL • type id_list_const SEMICOLON
+
+    BOOL    shift, and go to state 23
+    FLOAT   shift, and go to state 25
+    INT     shift, and go to state 26
+    LONG    shift, and go to state 27
+    SHORT   shift, and go to state 31
+    STRING  shift, and go to state 33
+
+    type  go to state 42
+
+
+State 25
+
+   10 type: FLOAT •
+
+    $default  reduce using rule 10 (type)
+
+
+State 26
+
+    9 type: INT •
+
+    $default  reduce using rule 9 (type)
+
+
+State 27
+
+   14 type: LONG •
+
+    $default  reduce using rule 14 (type)
+
+
+State 28
+
+   51 method_modifier: PRIVATE •
+
+    $default  reduce using rule 51 (method_modifier)
+
+
+State 29
+
+   50 method_modifier: PROTECTED •
+
+    $default  reduce using rule 50 (method_modifier)
+
+
+State 30
+
+   49 method_modifier: PUBLIC •
+
+    $default  reduce using rule 49 (method_modifier)
+
+
+State 31
+
+   13 type: SHORT •
+
+    $default  reduce using rule 13 (type)
+
+
+State 32
+
+   44 class_fields: STATIC • type id_list SEMICOLON
+
+    BOOL    shift, and go to state 23
+    FLOAT   shift, and go to state 25
+    INT     shift, and go to state 26
+    LONG    shift, and go to state 27
+    SHORT   shift, and go to state 31
+    STRING  shift, and go to state 33
+
+    type  go to state 43
+
+
+State 33
+
+   12 type: STRING •
+
+    $default  reduce using rule 12 (type)
+
+
+State 34
+
+   45 instance_fields: type • id_list SEMICOLON
+   47                | type • LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    LBRACKET  shift, and go to state 44
+    ID_TOK    shift, and go to state 45
+
+    id_item  go to state 46
+    id_list  go to state 47
+
+
+State 35
+
+   37 class_body: LBRACE class_body_declaration • RBRACE
+
+    RBRACE  shift, and go to state 48
+
+
+State 36
+
+   38 class_body_declaration: fields •
+   40                       | fields • class_body_declaration
+
+    BOOL       shift, and go to state 23
+    FINAL      shift, and go to state 24
+    FLOAT      shift, and go to state 25
+    INT        shift, and go to state 26
+    LONG       shift, and go to state 27
+    PRIVATE    shift, and go to state 28
+    PROTECTED  shift, and go to state 29
+    PUBLIC     shift, and go to state 30
+    SHORT      shift, and go to state 31
+    STATIC     shift, and go to state 32
+    STRING     shift, and go to state 33
+
+    $default  reduce using rule 38 (class_body_declaration)
+
+    type                    go to state 34
+    class_body_declaration  go to state 49
+    fields                  go to state 36
+    class_fields            go to state 37
+    instance_fields         go to state 38
+    method                  go to state 39
+    method_modifier         go to state 40
+
+
+State 37
+
+   42 fields: class_fields •
+
+    $default  reduce using rule 42 (fields)
+
+
+State 38
+
+   43 fields: instance_fields •
+
+    $default  reduce using rule 43 (fields)
+
+
+State 39
+
+   39 class_body_declaration: method •
+   41                       | method • class_body_declaration
+
+    BOOL       shift, and go to state 23
+    FINAL      shift, and go to state 24
+    FLOAT      shift, and go to state 25
+    INT        shift, and go to state 26
+    LONG       shift, and go to state 27
+    PRIVATE    shift, and go to state 28
+    PROTECTED  shift, and go to state 29
+    PUBLIC     shift, and go to state 30
+    SHORT      shift, and go to state 31
+    STATIC     shift, and go to state 32
+    STRING     shift, and go to state 33
+
+    $default  reduce using rule 39 (class_body_declaration)
+
+    type                    go to state 34
+    class_body_declaration  go to state 50
+    fields                  go to state 36
+    class_fields            go to state 37
+    instance_fields         go to state 38
+    method                  go to state 39
+    method_modifier         go to state 40
+
+
+State 40
+
+   48 method: method_modifier • type ID_TOK LPAREN formal_arguments RPAREN compound_statement
+
+    BOOL    shift, and go to state 23
+    FLOAT   shift, and go to state 25
+    INT     shift, and go to state 26
+    LONG    shift, and go to state 27
+    SHORT   shift, and go to state 31
+    STRING  shift, and go to state 33
+
+    type  go to state 51
+
+
+State 41
+
+   36 interface_type_list: interface_type_list COMMA ID_TOK •
+
+    $default  reduce using rule 36 (interface_type_list)
+
+
+State 42
+
+   46 instance_fields: FINAL type • id_list_const SEMICOLON
+
+    ID_TOK  shift, and go to state 52
+
+    id_list_const  go to state 53
+
+
+State 43
+
+   44 class_fields: STATIC type • id_list SEMICOLON
+
+    ID_TOK  shift, and go to state 45
+
+    id_item  go to state 46
+    id_list  go to state 54
+
+
+State 44
+
+   47 instance_fields: type LBRACKET • RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    RBRACKET  shift, and go to state 55
+
+
+State 45
+
+   15 id_item: ID_TOK •
+   16        | ID_TOK • ASSIGN const_expr
+
+    ASSIGN  shift, and go to state 56
+
+    $default  reduce using rule 15 (id_item)
+
+
+State 46
+
+   17 id_list: id_item •
+
+    $default  reduce using rule 17 (id_list)
+
+
+State 47
+
+   18 id_list: id_list • COMMA id_item
+   45 instance_fields: type id_list • SEMICOLON
+
+    COMMA      shift, and go to state 57
+    SEMICOLON  shift, and go to state 58
+
+
+State 48
+
+   37 class_body: LBRACE class_body_declaration RBRACE •
+
+    $default  reduce using rule 37 (class_body)
+
+
+State 49
+
+   40 class_body_declaration: fields class_body_declaration •
+
+    $default  reduce using rule 40 (class_body_declaration)
+
+
+State 50
+
+   41 class_body_declaration: method class_body_declaration •
+
+    $default  reduce using rule 41 (class_body_declaration)
+
+
+State 51
+
+   48 method: method_modifier type • ID_TOK LPAREN formal_arguments RPAREN compound_statement
+
+    ID_TOK  shift, and go to state 59
+
+
+State 52
+
+   19 id_list_const: ID_TOK • ASSIGN const_expr
+
+    ASSIGN  shift, and go to state 60
+
+
+State 53
+
+   20 id_list_const: id_list_const • COMMA ID_TOK ASSIGN const_expr
+   46 instance_fields: FINAL type id_list_const • SEMICOLON
+
+    COMMA      shift, and go to state 61
+    SEMICOLON  shift, and go to state 62
+
+
+State 54
+
+   18 id_list: id_list • COMMA id_item
+   44 class_fields: STATIC type id_list • SEMICOLON
+
+    COMMA      shift, and go to state 57
+    SEMICOLON  shift, and go to state 63
+
+
+State 55
+
+   47 instance_fields: type LBRACKET RBRACKET • ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    ID_TOK  shift, and go to state 64
+
+
+State 56
+
+   16 id_item: ID_TOK ASSIGN • const_expr
+
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+
+    const_expr  go to state 70
+
+
+State 57
+
+   18 id_list: id_list COMMA • id_item
+
+    ID_TOK  shift, and go to state 45
+
+    id_item  go to state 71
+
+
+State 58
+
+   45 instance_fields: type id_list SEMICOLON •
+
+    $default  reduce using rule 45 (instance_fields)
+
+
+State 59
+
+   48 method: method_modifier type ID_TOK • LPAREN formal_arguments RPAREN compound_statement
+
+    LPAREN  shift, and go to state 72
+
+
+State 60
+
+   19 id_list_const: ID_TOK ASSIGN • const_expr
+
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+
+    const_expr  go to state 73
+
+
+State 61
+
+   20 id_list_const: id_list_const COMMA • ID_TOK ASSIGN const_expr
+
+    ID_TOK  shift, and go to state 74
+
+
+State 62
+
+   46 instance_fields: FINAL type id_list_const SEMICOLON •
+
+    $default  reduce using rule 46 (instance_fields)
+
+
+State 63
+
+   44 class_fields: STATIC type id_list SEMICOLON •
+
+    $default  reduce using rule 44 (class_fields)
+
+
+State 64
+
+   47 instance_fields: type LBRACKET RBRACKET ID_TOK • ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    ASSIGN  shift, and go to state 75
+
+
+State 65
+
+   25 const_expr: FALSE •
+
+    $default  reduce using rule 25 (const_expr)
+
+
+State 66
+
+   24 const_expr: TRUE •
+
+    $default  reduce using rule 24 (const_expr)
+
+
+State 67
+
+   21 const_expr: INT_LIT •
+
+    $default  reduce using rule 21 (const_expr)
+
+
+State 68
+
+   22 const_expr: FLOAT_LIT •
+
+    $default  reduce using rule 22 (const_expr)
+
+
+State 69
+
+   23 const_expr: STRING_LIT •
+
+    $default  reduce using rule 23 (const_expr)
+
+
+State 70
+
+   16 id_item: ID_TOK ASSIGN const_expr •
+
+    $default  reduce using rule 16 (id_item)
+
+
+State 71
+
+   18 id_list: id_list COMMA id_item •
+
+    $default  reduce using rule 18 (id_list)
+
+
+State 72
+
+   48 method: method_modifier type ID_TOK LPAREN • formal_arguments RPAREN compound_statement
+
+    BOOL    shift, and go to state 23
+    FLOAT   shift, and go to state 25
+    INT     shift, and go to state 26
+    LONG    shift, and go to state 27
+    SHORT   shift, and go to state 31
+    STRING  shift, and go to state 33
+
+    $default  reduce using rule 52 (formal_arguments)
+
+    type              go to state 76
+    formal_arguments  go to state 77
+    param_list        go to state 78
+
+
+State 73
+
+   19 id_list_const: ID_TOK ASSIGN const_expr •
+
+    $default  reduce using rule 19 (id_list_const)
+
+
+State 74
+
+   20 id_list_const: id_list_const COMMA ID_TOK • ASSIGN const_expr
+
+    ASSIGN  shift, and go to state 79
+
+
+State 75
+
+   47 instance_fields: type LBRACKET RBRACKET ID_TOK ASSIGN • NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    NEW  shift, and go to state 80
+
+
+State 76
+
+   54 param_list: type • ID_TOK
+
+    ID_TOK  shift, and go to state 81
+
+
+State 77
+
+   48 method: method_modifier type ID_TOK LPAREN formal_arguments • RPAREN compound_statement
+
+    RPAREN  shift, and go to state 82
+
+
+State 78
+
+   53 formal_arguments: param_list •
+   55 param_list: param_list • COMMA type ID_TOK
+
+    COMMA  shift, and go to state 83
+
+    $default  reduce using rule 53 (formal_arguments)
+
+
+State 79
+
+   20 id_list_const: id_list_const COMMA ID_TOK ASSIGN • const_expr
+
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+
+    const_expr  go to state 84
+
+
+State 80
+
+   47 instance_fields: type LBRACKET RBRACKET ID_TOK ASSIGN NEW • type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    BOOL    shift, and go to state 23
+    FLOAT   shift, and go to state 25
+    INT     shift, and go to state 26
+    LONG    shift, and go to state 27
+    SHORT   shift, and go to state 31
+    STRING  shift, and go to state 33
+
+    type  go to state 85
+
+
+State 81
+
+   54 param_list: type ID_TOK •
+
+    $default  reduce using rule 54 (param_list)
+
+
+State 82
+
+   48 method: method_modifier type ID_TOK LPAREN formal_arguments RPAREN • compound_statement
+
+    LBRACE  shift, and go to state 86
+
+    compound_statement  go to state 87
+
+
+State 83
+
+   55 param_list: param_list COMMA • type ID_TOK
+
+    BOOL    shift, and go to state 23
+    FLOAT   shift, and go to state 25
+    INT     shift, and go to state 26
+    LONG    shift, and go to state 27
+    SHORT   shift, and go to state 31
+    STRING  shift, and go to state 33
+
+    type  go to state 88
+
+
+State 84
+
+   20 id_list_const: id_list_const COMMA ID_TOK ASSIGN const_expr •
+
+    $default  reduce using rule 20 (id_list_const)
+
+
+State 85
+
+   47 instance_fields: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type • LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    LBRACKET  shift, and go to state 89
+
+
+State 86
+
+   61 compound_statement: LBRACE • compound_statement_body RBRACE
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    BOOL        shift, and go to state 23
+    FALSE       shift, and go to state 65
+    FINAL       shift, and go to state 94
+    FLOAT       shift, and go to state 25
+    FOR         shift, and go to state 95
+    IF          shift, and go to state 96
+    INT         shift, and go to state 26
+    LONG        shift, and go to state 27
+    PRINT       shift, and go to state 97
+    RETURN      shift, and go to state 98
+    SHORT       shift, and go to state 31
+    STATIC      shift, and go to state 99
+    STRING      shift, and go to state 33
+    TRUE        shift, and go to state 66
+    WHILE       shift, and go to state 100
+    SEMICOLON   shift, and go to state 101
+    LPAREN      shift, and go to state 102
+    LBRACE      shift, and go to state 86
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+    READ        shift, and go to state 104
+
+    $default  reduce using rule 62 (compound_statement_body)
+
+    variable_declaration     go to state 105
+    type                     go to state 106
+    const_expr               go to state 107
+    statement                go to state 108
+    compound_statement       go to state 109
+    compound_statement_body  go to state 110
+    simple_statement         go to state 111
+    name                     go to state 112
+    expression               go to state 113
+    term                     go to state 114
+    factor                   go to state 115
+    prefixOP                 go to state 116
+    method_invocation        go to state 117
+    conditional_statement    go to state 118
+    loop_statement           go to state 119
+    while                    go to state 120
+    for                      go to state 121
+    return_statement         go to state 122
+
+
+State 87
+
+   48 method: method_modifier type ID_TOK LPAREN formal_arguments RPAREN compound_statement •
+
+    $default  reduce using rule 48 (method)
+
+
+State 88
+
+   55 param_list: param_list COMMA type • ID_TOK
+
+    ID_TOK  shift, and go to state 123
+
+
+State 89
+
+   47 instance_fields: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET • INT_LIT RBRACKET SEMICOLON
+
+    INT_LIT  shift, and go to state 124
+
+
+State 90
+
+   86 prefixOP: ADD •
+
+    $default  reduce using rule 86 (prefixOP)
+
+
+State 91
+
+   84 prefixOP: INC •
+
+    $default  reduce using rule 84 (prefixOP)
+
+
+State 92
+
+   87 prefixOP: MINUS •
+
+    $default  reduce using rule 87 (prefixOP)
+
+
+State 93
+
+   85 prefixOP: DEC •
+
+    $default  reduce using rule 85 (prefixOP)
+
+
+State 94
+
+    8 variable_declaration: FINAL • type id_list_const SEMICOLON
+
+    BOOL    shift, and go to state 23
+    FLOAT   shift, and go to state 25
+    INT     shift, and go to state 26
+    LONG    shift, and go to state 27
+    SHORT   shift, and go to state 31
+    STRING  shift, and go to state 33
+
+    type  go to state 125
+
+
+State 95
+
+  110 for: FOR • LPAREN forInitOpt SEMICOLON boolean_expr SEMICOLON forUpdateOpt RPAREN if_else_loop_statement
+
+    LPAREN  shift, and go to state 126
+
+
+State 96
+
+   95 conditional_statement: IF • LPAREN boolean_expr RPAREN if_else_loop_statement
+   96                      | IF • LPAREN boolean_expr RPAREN if_else_loop_statement else
+
+    LPAREN  shift, and go to state 127
+
+
+State 97
+
+   66 simple_statement: PRINT • LPAREN expression RPAREN SEMICOLON
+
+    LPAREN  shift, and go to state 128
+
+
+State 98
+
+  119 return_statement: RETURN • expression SEMICOLON
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 130
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 99
+
+    5 variable_declaration: STATIC • type id_list SEMICOLON
+
+    BOOL    shift, and go to state 23
+    FLOAT   shift, and go to state 25
+    INT     shift, and go to state 26
+    LONG    shift, and go to state 27
+    SHORT   shift, and go to state 31
+    STRING  shift, and go to state 33
+
+    type  go to state 131
+
+
+State 100
+
+  109 while: WHILE • LPAREN boolean_expr RPAREN if_else_loop_statement
+
+    LPAREN  shift, and go to state 132
+
+
+State 101
+
+   69 simple_statement: SEMICOLON •
+
+    $default  reduce using rule 69 (simple_statement)
+
+
+State 102
+
+   80 factor: LPAREN • expression RPAREN
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 133
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 103
+
+   70 name: ID_TOK •
+   71     | ID_TOK • DOT ID_TOK
+   78 factor: ID_TOK •
+   82       | ID_TOK • postfixOP
+
+    INC  shift, and go to state 134
+    DEC  shift, and go to state 135
+    DOT  shift, and go to state 136
+
+    ASSIGN    reduce using rule 70 (name)
+    LPAREN    reduce using rule 70 (name)
+    $default  reduce using rule 78 (factor)
+
+    postfixOP  go to state 137
+
+
+State 104
+
+   67 simple_statement: READ • LPAREN name RPAREN SEMICOLON
+
+    LPAREN  shift, and go to state 138
+
+
+State 105
+
+   63 compound_statement_body: variable_declaration • compound_statement_body
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    BOOL        shift, and go to state 23
+    FALSE       shift, and go to state 65
+    FINAL       shift, and go to state 94
+    FLOAT       shift, and go to state 25
+    FOR         shift, and go to state 95
+    IF          shift, and go to state 96
+    INT         shift, and go to state 26
+    LONG        shift, and go to state 27
+    PRINT       shift, and go to state 97
+    RETURN      shift, and go to state 98
+    SHORT       shift, and go to state 31
+    STATIC      shift, and go to state 99
+    STRING      shift, and go to state 33
+    TRUE        shift, and go to state 66
+    WHILE       shift, and go to state 100
+    SEMICOLON   shift, and go to state 101
+    LPAREN      shift, and go to state 102
+    LBRACE      shift, and go to state 86
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+    READ        shift, and go to state 104
+
+    $default  reduce using rule 62 (compound_statement_body)
+
+    variable_declaration     go to state 105
+    type                     go to state 106
+    const_expr               go to state 107
+    statement                go to state 108
+    compound_statement       go to state 109
+    compound_statement_body  go to state 139
+    simple_statement         go to state 111
+    name                     go to state 112
+    expression               go to state 113
+    term                     go to state 114
+    factor                   go to state 115
+    prefixOP                 go to state 116
+    method_invocation        go to state 117
+    conditional_statement    go to state 118
+    loop_statement           go to state 119
+    while                    go to state 120
+    for                      go to state 121
+    return_statement         go to state 122
+
+
+State 106
+
+    6 variable_declaration: type • id_list SEMICOLON
+    7                     | type • LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    LBRACKET  shift, and go to state 140
+    ID_TOK    shift, and go to state 45
+
+    id_item  go to state 46
+    id_list  go to state 141
+
+
+State 107
+
+   79 factor: const_expr •
+
+    $default  reduce using rule 79 (factor)
+
+
+State 108
+
+   64 compound_statement_body: statement • compound_statement_body
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    BOOL        shift, and go to state 23
+    FALSE       shift, and go to state 65
+    FINAL       shift, and go to state 94
+    FLOAT       shift, and go to state 25
+    FOR         shift, and go to state 95
+    IF          shift, and go to state 96
+    INT         shift, and go to state 26
+    LONG        shift, and go to state 27
+    PRINT       shift, and go to state 97
+    RETURN      shift, and go to state 98
+    SHORT       shift, and go to state 31
+    STATIC      shift, and go to state 99
+    STRING      shift, and go to state 33
+    TRUE        shift, and go to state 66
+    WHILE       shift, and go to state 100
+    SEMICOLON   shift, and go to state 101
+    LPAREN      shift, and go to state 102
+    LBRACE      shift, and go to state 86
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+    READ        shift, and go to state 104
+
+    $default  reduce using rule 62 (compound_statement_body)
+
+    variable_declaration     go to state 105
+    type                     go to state 106
+    const_expr               go to state 107
+    statement                go to state 108
+    compound_statement       go to state 109
+    compound_statement_body  go to state 142
+    simple_statement         go to state 111
+    name                     go to state 112
+    expression               go to state 113
+    term                     go to state 114
+    factor                   go to state 115
+    prefixOP                 go to state 116
+    method_invocation        go to state 117
+    conditional_statement    go to state 118
+    loop_statement           go to state 119
+    while                    go to state 120
+    for                      go to state 121
+    return_statement         go to state 122
+
+
+State 109
+
+   56 statement: compound_statement •
+
+    $default  reduce using rule 56 (statement)
+
+
+State 110
+
+   61 compound_statement: LBRACE compound_statement_body • RBRACE
+
+    RBRACE  shift, and go to state 143
+
+
+State 111
+
+   57 statement: simple_statement •
+
+    $default  reduce using rule 57 (statement)
+
+
+State 112
+
+   65 simple_statement: name • ASSIGN expression SEMICOLON
+   90 method_invocation: name • LPAREN arguments RPAREN
+
+    ASSIGN  shift, and go to state 144
+    LPAREN  shift, and go to state 145
+
+
+State 113
+
+   68 simple_statement: expression • SEMICOLON
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+
+    ADD        shift, and go to state 146
+    MINUS      shift, and go to state 147
+    SEMICOLON  shift, and go to state 148
+
+
+State 114
+
+   72 expression: term •
+   76 term: term • MUL factor
+   77     | term • DIV factor
+
+    MUL  shift, and go to state 149
+    DIV  shift, and go to state 150
+
+    $default  reduce using rule 72 (expression)
+
+
+State 115
+
+   75 term: factor •
+
+    $default  reduce using rule 75 (term)
+
+
+State 116
+
+   81 factor: prefixOP • ID_TOK
+
+    ID_TOK  shift, and go to state 151
+
+
+State 117
+
+   83 factor: method_invocation •
+
+    $default  reduce using rule 83 (factor)
+
+
+State 118
+
+   58 statement: conditional_statement •
+
+    $default  reduce using rule 58 (statement)
+
+
+State 119
+
+   59 statement: loop_statement •
+
+    $default  reduce using rule 59 (statement)
+
+
+State 120
+
+  107 loop_statement: while •
+
+    $default  reduce using rule 107 (loop_statement)
+
+
+State 121
+
+  108 loop_statement: for •
+
+    $default  reduce using rule 108 (loop_statement)
+
+
+State 122
+
+   60 statement: return_statement •
+
+    $default  reduce using rule 60 (statement)
+
+
+State 123
+
+   55 param_list: param_list COMMA type ID_TOK •
+
+    $default  reduce using rule 55 (param_list)
+
+
+State 124
+
+   47 instance_fields: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT • RBRACKET SEMICOLON
+
+    RBRACKET  shift, and go to state 152
+
+
+State 125
+
+    8 variable_declaration: FINAL type • id_list_const SEMICOLON
+
+    ID_TOK  shift, and go to state 52
+
+    id_list_const  go to state 153
+
+
+State 126
+
+  110 for: FOR LPAREN • forInitOpt SEMICOLON boolean_expr SEMICOLON forUpdateOpt RPAREN if_else_loop_statement
+
+    INT     shift, and go to state 154
+    ID_TOK  shift, and go to state 155
+
+    $default  reduce using rule 111 (forInitOpt)
+
+    forInitOpt  go to state 156
+    init_item   go to state 157
+    init_list   go to state 158
+
+
+State 127
+
+   95 conditional_statement: IF LPAREN • boolean_expr RPAREN if_else_loop_statement
+   96                      | IF LPAREN • boolean_expr RPAREN if_else_loop_statement else
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 159
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+    boolean_expr       go to state 160
+
+
+State 128
+
+   66 simple_statement: PRINT LPAREN • expression RPAREN SEMICOLON
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 161
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 129
+
+   90 method_invocation: name • LPAREN arguments RPAREN
+
+    LPAREN  shift, and go to state 145
+
+
+State 130
+
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+  119 return_statement: RETURN expression • SEMICOLON
+
+    ADD        shift, and go to state 146
+    MINUS      shift, and go to state 147
+    SEMICOLON  shift, and go to state 162
+
+
+State 131
+
+    5 variable_declaration: STATIC type • id_list SEMICOLON
+
+    ID_TOK  shift, and go to state 45
+
+    id_item  go to state 46
+    id_list  go to state 163
+
+
+State 132
+
+  109 while: WHILE LPAREN • boolean_expr RPAREN if_else_loop_statement
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 159
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+    boolean_expr       go to state 164
+
+
+State 133
+
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+   80 factor: LPAREN expression • RPAREN
+
+    ADD     shift, and go to state 146
+    MINUS   shift, and go to state 147
+    RPAREN  shift, and go to state 165
+
+
+State 134
+
+   88 postfixOP: INC •
+
+    $default  reduce using rule 88 (postfixOP)
+
+
+State 135
+
+   89 postfixOP: DEC •
+
+    $default  reduce using rule 89 (postfixOP)
+
+
+State 136
+
+   71 name: ID_TOK DOT • ID_TOK
+
+    ID_TOK  shift, and go to state 166
+
+
+State 137
+
+   82 factor: ID_TOK postfixOP •
+
+    $default  reduce using rule 82 (factor)
+
+
+State 138
+
+   67 simple_statement: READ LPAREN • name RPAREN SEMICOLON
+
+    ID_TOK  shift, and go to state 167
+
+    name  go to state 168
+
+
+State 139
+
+   63 compound_statement_body: variable_declaration compound_statement_body •
+
+    $default  reduce using rule 63 (compound_statement_body)
+
+
+State 140
+
+    7 variable_declaration: type LBRACKET • RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    RBRACKET  shift, and go to state 169
+
+
+State 141
+
+    6 variable_declaration: type id_list • SEMICOLON
+   18 id_list: id_list • COMMA id_item
+
+    COMMA      shift, and go to state 57
+    SEMICOLON  shift, and go to state 170
+
+
+State 142
+
+   64 compound_statement_body: statement compound_statement_body •
+
+    $default  reduce using rule 64 (compound_statement_body)
+
+
+State 143
+
+   61 compound_statement: LBRACE compound_statement_body RBRACE •
+
+    $default  reduce using rule 61 (compound_statement)
+
+
+State 144
+
+   65 simple_statement: name ASSIGN • expression SEMICOLON
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 171
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 145
+
+   90 method_invocation: name LPAREN • arguments RPAREN
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    $default  reduce using rule 91 (arguments)
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 172
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+    arguments          go to state 173
+    arg_list           go to state 174
+
+
+State 146
+
+   73 expression: expression ADD • term
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    term               go to state 175
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 147
+
+   74 expression: expression MINUS • term
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    term               go to state 176
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 148
+
+   68 simple_statement: expression SEMICOLON •
+
+    $default  reduce using rule 68 (simple_statement)
+
+
+State 149
+
+   76 term: term MUL • factor
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    factor             go to state 177
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 150
+
+   77 term: term DIV • factor
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    factor             go to state 178
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 151
+
+   81 factor: prefixOP ID_TOK •
+
+    $default  reduce using rule 81 (factor)
+
+
+State 152
+
+   47 instance_fields: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET • SEMICOLON
+
+    SEMICOLON  shift, and go to state 179
+
+
+State 153
+
+    8 variable_declaration: FINAL type id_list_const • SEMICOLON
+   20 id_list_const: id_list_const • COMMA ID_TOK ASSIGN const_expr
+
+    COMMA      shift, and go to state 61
+    SEMICOLON  shift, and go to state 180
+
+
+State 154
+
+  114 init_item: INT • ID_TOK ASSIGN expression
+
+    ID_TOK  shift, and go to state 181
+
+
+State 155
+
+  113 init_item: ID_TOK • ASSIGN expression
+
+    ASSIGN  shift, and go to state 182
+
+
+State 156
+
+  110 for: FOR LPAREN forInitOpt • SEMICOLON boolean_expr SEMICOLON forUpdateOpt RPAREN if_else_loop_statement
+
+    SEMICOLON  shift, and go to state 183
+
+
+State 157
+
+  115 init_list: init_item •
+
+    $default  reduce using rule 115 (init_list)
+
+
+State 158
+
+  112 forInitOpt: init_list •
+  116 init_list: init_list • COMMA init_item
+
+    COMMA  shift, and go to state 184
+
+    $default  reduce using rule 112 (forInitOpt)
+
+
+State 159
+
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+   98 boolean_expr: expression • infixOP expression
+
+    ADD    shift, and go to state 146
+    MINUS  shift, and go to state 147
+    EQ     shift, and go to state 185
+    NE     shift, and go to state 186
+    LT     shift, and go to state 187
+    LE     shift, and go to state 188
+    GT     shift, and go to state 189
+    GE     shift, and go to state 190
+
+    infixOP  go to state 191
+
+
+State 160
+
+   95 conditional_statement: IF LPAREN boolean_expr • RPAREN if_else_loop_statement
+   96                      | IF LPAREN boolean_expr • RPAREN if_else_loop_statement else
+
+    RPAREN  shift, and go to state 192
+
+
+State 161
+
+   66 simple_statement: PRINT LPAREN expression • RPAREN SEMICOLON
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+
+    ADD     shift, and go to state 146
+    MINUS   shift, and go to state 147
+    RPAREN  shift, and go to state 193
+
+
+State 162
+
+  119 return_statement: RETURN expression SEMICOLON •
+
+    $default  reduce using rule 119 (return_statement)
+
+
+State 163
+
+    5 variable_declaration: STATIC type id_list • SEMICOLON
+   18 id_list: id_list • COMMA id_item
+
+    COMMA      shift, and go to state 57
+    SEMICOLON  shift, and go to state 194
+
+
+State 164
+
+  109 while: WHILE LPAREN boolean_expr • RPAREN if_else_loop_statement
+
+    RPAREN  shift, and go to state 195
+
+
+State 165
+
+   80 factor: LPAREN expression RPAREN •
+
+    $default  reduce using rule 80 (factor)
+
+
+State 166
+
+   71 name: ID_TOK DOT ID_TOK •
+
+    $default  reduce using rule 71 (name)
+
+
+State 167
+
+   70 name: ID_TOK •
+   71     | ID_TOK • DOT ID_TOK
+
+    DOT  shift, and go to state 136
+
+    $default  reduce using rule 70 (name)
+
+
+State 168
+
+   67 simple_statement: READ LPAREN name • RPAREN SEMICOLON
+
+    RPAREN  shift, and go to state 196
+
+
+State 169
+
+    7 variable_declaration: type LBRACKET RBRACKET • ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    ID_TOK  shift, and go to state 197
+
+
+State 170
+
+    6 variable_declaration: type id_list SEMICOLON •
+
+    $default  reduce using rule 6 (variable_declaration)
+
+
+State 171
+
+   65 simple_statement: name ASSIGN expression • SEMICOLON
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+
+    ADD        shift, and go to state 146
+    MINUS      shift, and go to state 147
+    SEMICOLON  shift, and go to state 198
+
+
+State 172
+
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+   93 arg_list: expression •
+
+    ADD    shift, and go to state 146
+    MINUS  shift, and go to state 147
+
+    $default  reduce using rule 93 (arg_list)
+
+
+State 173
+
+   90 method_invocation: name LPAREN arguments • RPAREN
+
+    RPAREN  shift, and go to state 199
+
+
+State 174
+
+   92 arguments: arg_list •
+   94 arg_list: arg_list • COMMA expression
+
+    COMMA  shift, and go to state 200
+
+    $default  reduce using rule 92 (arguments)
+
+
+State 175
+
+   73 expression: expression ADD term •
+   76 term: term • MUL factor
+   77     | term • DIV factor
+
+    MUL  shift, and go to state 149
+    DIV  shift, and go to state 150
+
+    $default  reduce using rule 73 (expression)
+
+
+State 176
+
+   74 expression: expression MINUS term •
+   76 term: term • MUL factor
+   77     | term • DIV factor
+
+    MUL  shift, and go to state 149
+    DIV  shift, and go to state 150
+
+    $default  reduce using rule 74 (expression)
+
+
+State 177
+
+   76 term: term MUL factor •
+
+    $default  reduce using rule 76 (term)
+
+
+State 178
+
+   77 term: term DIV factor •
+
+    $default  reduce using rule 77 (term)
+
+
+State 179
+
+   47 instance_fields: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON •
+
+    $default  reduce using rule 47 (instance_fields)
+
+
+State 180
+
+    8 variable_declaration: FINAL type id_list_const SEMICOLON •
+
+    $default  reduce using rule 8 (variable_declaration)
+
+
+State 181
+
+  114 init_item: INT ID_TOK • ASSIGN expression
+
+    ASSIGN  shift, and go to state 201
+
+
+State 182
+
+  113 init_item: ID_TOK ASSIGN • expression
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 202
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 183
+
+  110 for: FOR LPAREN forInitOpt SEMICOLON • boolean_expr SEMICOLON forUpdateOpt RPAREN if_else_loop_statement
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 159
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+    boolean_expr       go to state 203
+
+
+State 184
+
+  116 init_list: init_list COMMA • init_item
+
+    INT     shift, and go to state 154
+    ID_TOK  shift, and go to state 155
+
+    init_item  go to state 204
+
+
+State 185
+
+   99 infixOP: EQ •
+
+    $default  reduce using rule 99 (infixOP)
+
+
+State 186
+
+  100 infixOP: NE •
+
+    $default  reduce using rule 100 (infixOP)
+
+
+State 187
+
+  101 infixOP: LT •
+
+    $default  reduce using rule 101 (infixOP)
+
+
+State 188
+
+  102 infixOP: LE •
+
+    $default  reduce using rule 102 (infixOP)
+
+
+State 189
+
+  103 infixOP: GT •
+
+    $default  reduce using rule 103 (infixOP)
+
+
+State 190
+
+  104 infixOP: GE •
+
+    $default  reduce using rule 104 (infixOP)
+
+
+State 191
+
+   98 boolean_expr: expression infixOP • expression
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 205
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 192
+
+   95 conditional_statement: IF LPAREN boolean_expr RPAREN • if_else_loop_statement
+   96                      | IF LPAREN boolean_expr RPAREN • if_else_loop_statement else
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    PRINT       shift, and go to state 97
+    TRUE        shift, and go to state 66
+    SEMICOLON   shift, and go to state 101
+    LPAREN      shift, and go to state 102
+    LBRACE      shift, and go to state 86
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+    READ        shift, and go to state 104
+
+    const_expr              go to state 107
+    compound_statement      go to state 206
+    simple_statement        go to state 207
+    name                    go to state 112
+    expression              go to state 113
+    term                    go to state 114
+    factor                  go to state 115
+    prefixOP                go to state 116
+    method_invocation       go to state 117
+    if_else_loop_statement  go to state 208
+
+
+State 193
+
+   66 simple_statement: PRINT LPAREN expression RPAREN • SEMICOLON
+
+    SEMICOLON  shift, and go to state 209
+
+
+State 194
+
+    5 variable_declaration: STATIC type id_list SEMICOLON •
+
+    $default  reduce using rule 5 (variable_declaration)
+
+
+State 195
+
+  109 while: WHILE LPAREN boolean_expr RPAREN • if_else_loop_statement
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    PRINT       shift, and go to state 97
+    TRUE        shift, and go to state 66
+    SEMICOLON   shift, and go to state 101
+    LPAREN      shift, and go to state 102
+    LBRACE      shift, and go to state 86
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+    READ        shift, and go to state 104
+
+    const_expr              go to state 107
+    compound_statement      go to state 206
+    simple_statement        go to state 207
+    name                    go to state 112
+    expression              go to state 113
+    term                    go to state 114
+    factor                  go to state 115
+    prefixOP                go to state 116
+    method_invocation       go to state 117
+    if_else_loop_statement  go to state 210
+
+
+State 196
+
+   67 simple_statement: READ LPAREN name RPAREN • SEMICOLON
+
+    SEMICOLON  shift, and go to state 211
+
+
+State 197
+
+    7 variable_declaration: type LBRACKET RBRACKET ID_TOK • ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    ASSIGN  shift, and go to state 212
+
+
+State 198
+
+   65 simple_statement: name ASSIGN expression SEMICOLON •
+
+    $default  reduce using rule 65 (simple_statement)
+
+
+State 199
+
+   90 method_invocation: name LPAREN arguments RPAREN •
+
+    $default  reduce using rule 90 (method_invocation)
+
+
+State 200
+
+   94 arg_list: arg_list COMMA • expression
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 213
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 201
+
+  114 init_item: INT ID_TOK ASSIGN • expression
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    TRUE        shift, and go to state 66
+    LPAREN      shift, and go to state 102
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+
+    const_expr         go to state 107
+    name               go to state 129
+    expression         go to state 214
+    term               go to state 114
+    factor             go to state 115
+    prefixOP           go to state 116
+    method_invocation  go to state 117
+
+
+State 202
+
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+  113 init_item: ID_TOK ASSIGN expression •
+
+    ADD    shift, and go to state 146
+    MINUS  shift, and go to state 147
+
+    $default  reduce using rule 113 (init_item)
+
+
+State 203
+
+  110 for: FOR LPAREN forInitOpt SEMICOLON boolean_expr • SEMICOLON forUpdateOpt RPAREN if_else_loop_statement
+
+    SEMICOLON  shift, and go to state 215
+
+
+State 204
+
+  116 init_list: init_list COMMA init_item •
+
+    $default  reduce using rule 116 (init_list)
+
+
+State 205
+
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+   98 boolean_expr: expression infixOP expression •
+
+    ADD    shift, and go to state 146
+    MINUS  shift, and go to state 147
+
+    $default  reduce using rule 98 (boolean_expr)
+
+
+State 206
+
+  106 if_else_loop_statement: compound_statement •
+
+    $default  reduce using rule 106 (if_else_loop_statement)
+
+
+State 207
+
+  105 if_else_loop_statement: simple_statement •
+
+    $default  reduce using rule 105 (if_else_loop_statement)
+
+
+State 208
+
+   95 conditional_statement: IF LPAREN boolean_expr RPAREN if_else_loop_statement •
+   96                      | IF LPAREN boolean_expr RPAREN if_else_loop_statement • else
+
+    ELSE  shift, and go to state 216
+
+    $default  reduce using rule 95 (conditional_statement)
+
+    else  go to state 217
+
+
+State 209
+
+   66 simple_statement: PRINT LPAREN expression RPAREN SEMICOLON •
+
+    $default  reduce using rule 66 (simple_statement)
+
+
+State 210
+
+  109 while: WHILE LPAREN boolean_expr RPAREN if_else_loop_statement •
+
+    $default  reduce using rule 109 (while)
+
+
+State 211
+
+   67 simple_statement: READ LPAREN name RPAREN SEMICOLON •
+
+    $default  reduce using rule 67 (simple_statement)
+
+
+State 212
+
+    7 variable_declaration: type LBRACKET RBRACKET ID_TOK ASSIGN • NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    NEW  shift, and go to state 218
+
+
+State 213
+
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+   94 arg_list: arg_list COMMA expression •
+
+    ADD    shift, and go to state 146
+    MINUS  shift, and go to state 147
+
+    $default  reduce using rule 94 (arg_list)
+
+
+State 214
+
+   73 expression: expression • ADD term
+   74           | expression • MINUS term
+  114 init_item: INT ID_TOK ASSIGN expression •
+
+    ADD    shift, and go to state 146
+    MINUS  shift, and go to state 147
+
+    $default  reduce using rule 114 (init_item)
+
+
+State 215
+
+  110 for: FOR LPAREN forInitOpt SEMICOLON boolean_expr SEMICOLON • forUpdateOpt RPAREN if_else_loop_statement
+
+    ID_TOK  shift, and go to state 219
+
+    forUpdateOpt  go to state 220
+
+
+State 216
+
+   97 else: ELSE • if_else_loop_statement
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    PRINT       shift, and go to state 97
+    TRUE        shift, and go to state 66
+    SEMICOLON   shift, and go to state 101
+    LPAREN      shift, and go to state 102
+    LBRACE      shift, and go to state 86
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+    READ        shift, and go to state 104
+
+    const_expr              go to state 107
+    compound_statement      go to state 206
+    simple_statement        go to state 207
+    name                    go to state 112
+    expression              go to state 113
+    term                    go to state 114
+    factor                  go to state 115
+    prefixOP                go to state 116
+    method_invocation       go to state 117
+    if_else_loop_statement  go to state 221
+
+
+State 217
+
+   96 conditional_statement: IF LPAREN boolean_expr RPAREN if_else_loop_statement else •
+
+    $default  reduce using rule 96 (conditional_statement)
+
+
+State 218
+
+    7 variable_declaration: type LBRACKET RBRACKET ID_TOK ASSIGN NEW • type LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    BOOL    shift, and go to state 23
+    FLOAT   shift, and go to state 25
+    INT     shift, and go to state 26
+    LONG    shift, and go to state 27
+    SHORT   shift, and go to state 31
+    STRING  shift, and go to state 33
+
+    type  go to state 222
+
+
+State 219
+
+  117 forUpdateOpt: ID_TOK • INC
+  118             | ID_TOK • DEC
+
+    INC  shift, and go to state 223
+    DEC  shift, and go to state 224
+
+
+State 220
+
+  110 for: FOR LPAREN forInitOpt SEMICOLON boolean_expr SEMICOLON forUpdateOpt • RPAREN if_else_loop_statement
+
+    RPAREN  shift, and go to state 225
+
+
+State 221
+
+   97 else: ELSE if_else_loop_statement •
+
+    $default  reduce using rule 97 (else)
+
+
+State 222
+
+    7 variable_declaration: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type • LBRACKET INT_LIT RBRACKET SEMICOLON
+
+    LBRACKET  shift, and go to state 226
+
+
+State 223
+
+  117 forUpdateOpt: ID_TOK INC •
+
+    $default  reduce using rule 117 (forUpdateOpt)
+
+
+State 224
+
+  118 forUpdateOpt: ID_TOK DEC •
+
+    $default  reduce using rule 118 (forUpdateOpt)
+
+
+State 225
+
+  110 for: FOR LPAREN forInitOpt SEMICOLON boolean_expr SEMICOLON forUpdateOpt RPAREN • if_else_loop_statement
+
+    ADD         shift, and go to state 90
+    INC         shift, and go to state 91
+    MINUS       shift, and go to state 92
+    DEC         shift, and go to state 93
+    FALSE       shift, and go to state 65
+    PRINT       shift, and go to state 97
+    TRUE        shift, and go to state 66
+    SEMICOLON   shift, and go to state 101
+    LPAREN      shift, and go to state 102
+    LBRACE      shift, and go to state 86
+    INT_LIT     shift, and go to state 67
+    FLOAT_LIT   shift, and go to state 68
+    STRING_LIT  shift, and go to state 69
+    ID_TOK      shift, and go to state 103
+    READ        shift, and go to state 104
+
+    const_expr              go to state 107
+    compound_statement      go to state 206
+    simple_statement        go to state 207
+    name                    go to state 112
+    expression              go to state 113
+    term                    go to state 114
+    factor                  go to state 115
+    prefixOP                go to state 116
+    method_invocation       go to state 117
+    if_else_loop_statement  go to state 227
+
+
+State 226
+
+    7 variable_declaration: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET • INT_LIT RBRACKET SEMICOLON
+
+    INT_LIT  shift, and go to state 228
+
+
+State 227
+
+  110 for: FOR LPAREN forInitOpt SEMICOLON boolean_expr SEMICOLON forUpdateOpt RPAREN if_else_loop_statement •
+
+    $default  reduce using rule 110 (for)
+
+
+State 228
+
+    7 variable_declaration: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT • RBRACKET SEMICOLON
+
+    RBRACKET  shift, and go to state 229
+
+
+State 229
+
+    7 variable_declaration: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET • SEMICOLON
+
+    SEMICOLON  shift, and go to state 230
+
+
+State 230
+
+    7 variable_declaration: type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON •
+
+    $default  reduce using rule 7 (variable_declaration)

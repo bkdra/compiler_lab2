@@ -1,5 +1,3 @@
-
-
 %{
 #include "y.tab.h"          /* <-- Yacc 產生的 token 代號 */
 #include <stdio.h>
@@ -8,16 +6,8 @@
 
 #define MAXSIZE 10000
 
-typedef struct _Identifier{
-    int  order;
-    char *ID;
-    int  next;
-} Identifier;
-
 /* === 你的全域變數 (維持不變或自行取捨) ======================== */
-unsigned charCount = 1, idCount = 0, lineCount;
-int  isOperator    = 0;
-Identifier *table  = NULL;
+unsigned charCount = 1, lineCount;
 int isPrintedByComment = 0;
 int  isOverflow_int(char *str);       /* 你原來寫的判斷函式 */
 /* ============================================================ */
@@ -55,11 +45,14 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
 {eol}          { 
                     if(msg && !isPrintedByComment)
                     { 
-                        printf("line%3d: %s", lineCount, msg); 
+                        //printf("run3\n");
+                        printf("line%3d: %s", lineCount+1, msg); 
                     }
                     else
                     {
+                        //printf("run4\n");
                         printf("%s", msg);
+                        isPrintedByComment = 0;
                     }
                     memset(msg, 0, MAXSIZE);
                     printf("\n"); 
@@ -67,32 +60,50 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
                     lineCount++;       /* 換行：不累加 msg         */ 
                }
 
-{comment}      {    
+{comment}      {
+                    isPrintedByComment = 1;
                     int isPrinted = 1;
-                    if(msg)
+                    if(strlen(msg))
                     {
                         isPrinted = 0;
-                        printf("line%3d: %s", lineCount, msg); 
+                        printf("line%3d: %s", lineCount+1, msg); 
                         memset(msg, 0, MAXSIZE);
+                    }
+                    else
+                    {
+                        printf("line%3d: ", lineCount+1); 
                     }
 
                     charCount += yyleng;
-                    char *token = strtok(yytext, "\n");
-                    while (token != NULL) {
+
+                    int index = 0;
+                    while(index != strlen(yytext))
+                    {
                         if(!isPrinted)
                         {
-                            printf("%s\n", token);
-                            isPrinted = 1;
+                            if(yytext[index] == '\n')
+                            {
+                                isPrinted = 1;
+                                lineCount++;
+                                printf("%c", yytext[index]);
+                                printf("line%3d: ", lineCount+1);
+                            }
+                            else
+                                printf("%c", yytext[index]);
+                            index++;
                         }
                         else
                         {
-                            printf("line%3d: %s", lineCount, msg);
+                            printf("%c", yytext[index]);
+                            if(yytext[index] == '\n')
+                            {
+                                lineCount++;
+                                printf("line%3d: ", lineCount+1);
+                                
+                            }
+                            index++;
                         }
-                        lineCount++;
-                        token = strtok(NULL, "\n");
                     }
-                    isPrintedByComment = 1;
-                    append_token(yytext);
                }
 
 
@@ -127,6 +138,7 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
 "class"        { append_token(yytext); return CLASS;      }
 "const"        { append_token(yytext); return CONST;      }
 "continue"     { append_token(yytext); return CONTINUE;   }
+"char"         { append_token(yytext); return CHAR;       }
 "default"      { append_token(yytext); return DEFAULT;    }
 "do"           { append_token(yytext); return DO;         }
 "double"       { append_token(yytext); return DOUBLE;     }
@@ -141,7 +153,6 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
 "implements"   { append_token(yytext); return IMPLEMENTS; }
 "int"          { append_token(yytext); return INT;        }
 "long"         { append_token(yytext); return LONG;       }
-"main"         { append_token(yytext); return MAIN;       }
 "new"          { append_token(yytext); return NEW;        }
 "print"        { append_token(yytext); return PRINT;      }
 "read"         { append_token(yytext); return READ;       }
@@ -175,13 +186,11 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
 
 {int_lit}      {
                   append_token(yytext);
-                  yylval.iVal = atoi(yytext);            /* 對應到 %union 的成員 */
                   return INT_LIT;
                 }
 
 {float_lit}    {
                   append_token(yytext);
-                  yylval.fVal = atof(yytext);
                   return FLOAT_LIT;
                 }
 
@@ -235,8 +244,7 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
 
 {id}           {
                   append_token(yytext);
-                  yylval.str = strdup(yytext);
-                  return ID;
+                  return ID_TOK;
                 }
 {id_invalid}    {
                     append_token(yytext);
