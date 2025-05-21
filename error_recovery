@@ -1,0 +1,15 @@
+1. 檢查宣告的object type和賦予它的object type是否相同
+e.g. 
+(O): Point lowerLeft = new Point();
+(X): Point lowerLeft = new point();
+
+2.沒加分號
+再檢查一下各種狀況沒加分號的樣子要如何處裡
+
+3. 重複變數宣告
+
+4. 變數宣告格式錯誤(多個變數名稱之間沒有加逗號)
+
+5. else without if
+
+6. boolean expression錯誤

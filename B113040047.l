@@ -6,13 +6,9 @@
 
 #define MAXSIZE 10000
 
-/* === 你的全域變數 (維持不變或自行取捨) ======================== */
 unsigned charCount = 1, lineCount;
 int isPrintedByComment = 0;
 int  isOverflow_int(char *str);       /* 你原來寫的判斷函式 */
-/* ============================================================ */
-
-/* 收集所有 token 字串的緩衝區 */
 char msg[MAXSIZE] = "";
 
 /* 小工具：把 yytext 存進 msg，並補一個空白做分隔 */
@@ -25,7 +21,6 @@ static inline void append_token(const char *s){
 }
 %}
 
-/* ===================== 正規表示式區 ===================== */
 operator       \+\+|--|\+|-|\*|\/|%|==|!=|<=|>=|<|>|=|&&|\|\||!
 space          [ \t]+
 eol            \r?\n
@@ -33,14 +28,13 @@ id             [_a-zA-Z][_a-zA-Z0-9$]*
 id_invalid     [_a-zA-Z0-9$]+
 int_lit        (([0-9]+)|0x[0-9A-F]+)
 float_lit      ([0-9]*\.[0-9]+|[0-9]+\.)([eE][+-]?[0-9]+)?[fFdD]?
-string_lit     \".*\"
-invalid_string (\'.*\')|(\".*\\\")|(\"[^\"\n]*)
+string_lit     \"([^\"\\\n]|\\.)*\"
+invalid_string (\'.*\')|(\".*\\\")|(\"[^\"\n;)]*)
 comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
 
 
-/* ====================== 規則區 ====================== */
 %%
-{space}        { append_token(yytext); charCount += yyleng; /* 不累加 msg，也不回傳 token*/ }
+{space}        { append_token(yytext);  }
 
 {eol}          { 
                     if(msg && !isPrintedByComment)
@@ -56,7 +50,7 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
                     }
                     memset(msg, 0, MAXSIZE);
                     printf("\n"); 
-                    charCount = 1;
+                    charCount = 0;
                     lineCount++;       /* 換行：不累加 msg         */ 
                }
 
@@ -113,9 +107,9 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
                   append_token(yytext);
                   if      (!strcmp(yytext,"+"))   return ADD;
                   else if (!strcmp(yytext,"++"))  return INC;
-                  else if (!strcmp(yytext,"-"))   return MINUS;
-                  else if (!strcmp(yytext,"--"))  return DEC;
-                  else if (!strcmp(yytext,"*"))   return MUL;
+                  else if (!strcmp(yytext,"-"))   {/*printf("get MINUS\n");*/return MINUS;}
+                  else if (!strcmp(yytext,"--"))  {/*printf("get DEC\n");*/ return DEC;}
+                  else if (!strcmp(yytext,"*"))   {/*printf("get MUL\n");*/ return MUL;}
                   else if (!strcmp(yytext,"/"))   return DIV;
                   else if (!strcmp(yytext,"%"))   return MOD;
                   else if (!strcmp(yytext,"&&"))  return AND;
@@ -127,7 +121,7 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
                   else if (!strcmp(yytext,"<="))  return LE;
                   else if (!strcmp(yytext,">"))   return GT;
                   else if (!strcmp(yytext,">="))  return GE;
-                  else                            return ASSIGN;   /* '=' */
+                  else                            {/*printf("get ASSIGN\n");*/return ASSIGN;}   /* '=' */
                 }
 
 "boolean"      { append_token(yytext); return BOOL;       }
@@ -175,8 +169,8 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
 "."   { append_token(yytext); return DOT;        }
 ":"   { append_token(yytext); return COLON;      }
 ";"   { append_token(yytext); return SEMICOLON;  }
-"("   { append_token(yytext); return LPAREN;     }
-")"   { append_token(yytext); return RPAREN;     }
+"("   { append_token(yytext); /*printf("get LPAREN\n");*/ return LPAREN;     }
+")"   { append_token(yytext); /*printf("get RPAREN\n");*/ return RPAREN;     }
 "["   { append_token(yytext); return LBRACKET;   }
 "]"   { append_token(yytext); return RBRACKET;   }
 "{"   { append_token(yytext); return LBRACE;     }
@@ -186,6 +180,7 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
 
 {int_lit}      {
                   append_token(yytext);
+                  //printf("get INT_LIT\n");
                   return INT_LIT;
                 }
 
@@ -196,17 +191,19 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
 
 {invalid_string} {
 	// 把不合法的string挑出來，包含以單引號包起來的、結尾非雙引號的
+    append_token(yytext);
 	if(yytext[0] == '\'')
 		printf("\"%s\" is a wrong string. Cannot use (') as the quote of a string\n", yytext);
 	if((yytext[0] == '"' && yytext[strlen(yytext)-1] != '"') ||
 		(yytext[0] == '"' && yytext[strlen(yytext)-1] == '"' && yytext[strlen(yytext)-2] == '\\'))
-		printf("\"%s\" is a wrong string. The quoting is not closed.\n", yytext);
+		printf("%s is a wrong string. The quoting is not closed.\n", yytext);
 	charCount += yyleng;
+    return STRING_LIT;
 }
 
 {string_lit}   {
-                  append_token(yytext);
-                  /* 去掉首尾引號再給 Yacc */
+                    append_token(yytext);
+                    /* 去掉首尾引號再給 Yacc */
                     char* original_yytext = strdup(yytext);
                     int isWrongString = 0;
                     int wrongPosition = 0;
@@ -232,18 +229,20 @@ comment        \/\/[^\n]*|\/\*([^*]|\*+[^*/])*\*+\/
                     }
                     if(!isWrongString)
                     {
-                        append_token(original_yytext);
                         return STRING_LIT;
                     }
                     else
                     {	
                         charCount += yyleng;
                         printf("\"%s\" is a wrong string. Unvalid syntax of '\"'(Position: %d). \nIf you want to include '\"' in the string, you have to add '\\' immediately before it.\n", yytext, wrongPosition);
+                        return STRING_LIT;
                     }
                 }
 
 {id}           {
                   append_token(yytext);
+                  yylval.stringVal = strdup(yytext);
+                  //printf("get ID: %s\n", yytext);
                   return ID_TOK;
                 }
 {id_invalid}    {

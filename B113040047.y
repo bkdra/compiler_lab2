@@ -1,17 +1,27 @@
 %{
     #include <stdio.h>
+	#include <stdlib.h>
     #include <string.h>
     #include <math.h>
 	#define MAXSIZE 10000
+	#define MAXSIZE_STACK 1000
+	
+
     extern unsigned lineCount;
+	extern unsigned charCount;
     int yylex();
-    void yyerror();
+    void yyerror(const char* str);
 
 	int hashFunction_linear(char *s);
 	void create(); 
 	int lookup(char* s);
 	void insert(char* s);
 	void dump();
+	void enterScope();
+	void departScope();
+	int idStack[MAXSIZE_STACK];
+	int top = -1;
+	int notUsedID[MAXSIZE_STACK];
 
 	typedef struct _Identifier{
 		int order;
@@ -30,24 +40,27 @@
 %union{
     float floatVal;
     int intVal;
+	char* stringVal;
 }
 
 
-%type start_structures start_structure variable_declaration id_list id_list_const class_declaration
+%type start_structures start_structure id_list_const class_declaration
 %type class_modifier super interface interface_type_list class_body class_body_declaration
 %type fields class_fields instance_fields method method_modifier formal_arguments
 %type statement compound_statement simple_statement name type const_expr
 %type compound_statement_body expression term factor prefixOP postfixOP method_invocation arguments
-%type conditional_statement else boolean_expr infixOP if_else_loop_statement
-%type loop_statement while for forInitOpt return_statement forUpdateOpt id_item
-%type param_list arg_list init_item init_list
-
+%type boolean_expr infixOP if_else_loop_statement
+%type loop_statement while for forInitOpt return_statement forUpdateOpt
+%type param_list arg_list init_item init_list const_term const_factor array_item
+%type field_or_array_item wrongIDlist end_of_line conditional_statement else
+%type object_declaration variable_declaration id_item id_list id_list_const
 
 %token ADD INC MINUS DEC MUL DIV MOD AND OR NOT EQ NE LT LE GT GE ASSIGN BOOL BREAK BUTE CASE
 %token CATCH CLASS CONST CONTINUE DEFAULT DO DOUBLE ELSE EXTENDS FALSE FINAL FINALLY FLOAT FOR
 %token IF IMPLEMENTS INT LONG MAIN NEW PRINT PRIVATE PROTECTED PUBLIC RETURN SHORT STATIC STRING
 %token SWITCH THIS TRUE TRY VOID WHILE COMMA COLON SEMICOLON LPAREN RPAREN LBRACKET RBRACKET
-%token LBRACE RBRACE INT_LIT FLOAT_LIT STRING_LIT ID_TOK ABSTRACT DOT READ CHAR
+%token LBRACE RBRACE INT_LIT FLOAT_LIT STRING_LIT ABSTRACT DOT READ CHAR
+%token <stringVal> ID_TOK
 
 %left  OR
 %left  AND
@@ -56,6 +69,9 @@
 %left  MUL DIV MOD
 %right ASSIGN                      /* = 右結合 */
 %right INC DEC  
+
+%nonassoc LOWER_THAN_ELSE
+%nonassoc ELSE
 
 %%
 lines:  start_structures
@@ -69,8 +85,8 @@ start_structure: class_declaration
 	;
 
 variable_declaration: STATIC type id_list SEMICOLON
-	| type id_list SEMICOLON
-	| type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+	| type id_list end_of_line
+	| type LBRACKET RBRACKET ID_TOK{insert($4);} ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
 	| FINAL type id_list_const SEMICOLON
 	;
 
@@ -84,37 +100,50 @@ type: INT
 	| CHAR
 	;
 
+wrong_EOF: ADD | INC | MINUS | DEC | MUL | DIV | MOD | AND | OR | NOT | EQ
+    | NE | LT | LE | GT | GE | ASSIGN | BOOL | BREAK | BUTE | CASE
+    | CATCH | CLASS | CONST | CONTINUE | DEFAULT | DO | DOUBLE | ELSE | EXTENDS | FALSE
+    | FINAL | FINALLY | FLOAT | FOR | IF | IMPLEMENTS | INT | LONG | MAIN | NEW
+    | PRINT | PRIVATE | PROTECTED | PUBLIC | RETURN | SHORT | STATIC | STRING | SWITCH
+    | THIS | TRUE | TRY | VOID | WHILE | COMMA | COLON  | LPAREN | RPAREN
+    | LBRACKET | RBRACKET | LBRACE | RBRACE | INT_LIT | FLOAT_LIT | STRING_LIT | ABSTRACT | DOT | READ
+    | CHAR | ID_TOK
 
+end_of_line: SEMICOLON
+	| error wrong_EOF{
+		yyerror("statement without semicolon");
+		yyerrok;
+	}
 
-/* ── 先把 “一個變數” 定義清楚 ── */
 id_item
-    : ID_TOK
-    | ID_TOK ASSIGN const_expr
-    ;
+    : ID_TOK{/*printf("insert ID at id_item: %s\n", $1);*/ insert($1);}
+    | ID_TOK{insert($1);} ASSIGN const_expr
+    
 
 /* ── 再用左遞迴 + COMMA 串起來 ── */
 id_list
     : id_item
-    | id_list COMMA id_item
-    ;
+    | id_item COMMA id_list
+	| id_item wrongIDlist{
+		yyerror("invalid variable declaration");
+		yyerrok;
+	}
+    
+wrongIDlist: ID_TOK
+	| INT_LIT
+	| STRING_LIT
+	| FLOAT_LIT
 
-/* const 版本一樣的寫法 */
 id_list_const
-    : ID_TOK ASSIGN const_expr      /* 這邊如果真的只能 const，請再細分 */
-    | id_list_const COMMA ID_TOK ASSIGN const_expr
+    : ID_TOK{/*printf("insert ID at id_list_const: %s\n", $1);*/insert($1);} ASSIGN const_expr      /* 這邊如果真的只能 const，請再細分 */
+    | id_list_const COMMA ID_TOK{insert($3);} ASSIGN const_expr
     ;
 
 
-const_expr
-    : INT_LIT
-    | FLOAT_LIT
-    | STRING_LIT
-    | TRUE
-    | FALSE
-    ;
 
 
-class_declaration: class_modifier CLASS ID_TOK super interface class_body
+
+class_declaration: class_modifier CLASS ID_TOK{/*printf("insert ID: %s\n", $3);*/ insert($3);} super interface class_body
 	;
 
 class_modifier: 
@@ -137,30 +166,35 @@ interface_type_list
     ;
 
 
-class_body: LBRACE class_body_declaration RBRACE
+class_body: LBRACE{enterScope();} class_body_declaration RBRACE{departScope();}
 	;
 
 class_body_declaration: fields
 	| method
 	| fields class_body_declaration	
 	| method class_body_declaration
+	| error SEMICOLON{
+		// printf("run class_body_declaration's yyerrok\n");
+		yyerrok;
+	}
 	;
 
 fields: class_fields
 	| instance_fields
+	| object_declaration
 	;
 
 class_fields: STATIC type id_list SEMICOLON
 	;
 
-instance_fields: type id_list SEMICOLON
+instance_fields: type id_list end_of_line
 	| FINAL type id_list_const SEMICOLON
-	| type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET SEMICOLON
+	| type LBRACKET RBRACKET ID_TOK ASSIGN NEW type LBRACKET INT_LIT RBRACKET end_of_line
 	;
 
-method: method_modifier type ID_TOK LPAREN formal_arguments RPAREN compound_statement
-	| type ID_TOK LPAREN formal_arguments RPAREN compound_statement
-	| ID_TOK LPAREN formal_arguments RPAREN compound_statement
+method: method_modifier type ID_TOK{/*printf("insert ID method: %s\n", $3);*/insert($3);} LPAREN formal_arguments RPAREN compound_statement
+	| type ID_TOK{/*printf("insert ID method: %s\n", $2);*/insert($2);} LPAREN formal_arguments RPAREN compound_statement
+	| ID_TOK{/*printf("insert ID method: %s\n", $1);*/insert($1);} LPAREN formal_arguments RPAREN compound_statement
 	;
 
 method_modifier: PUBLIC
@@ -181,28 +215,80 @@ statement: compound_statement
 	| simple_statement
 	| conditional_statement
 	| loop_statement
-	| return_statement
+	| ELSE statement 
+	{
+        yyerror("else without if");
+        yyerrok;      /* 清除錯誤狀態，繼續解析後面的輸入 */
+    }
 	;
 
-compound_statement: LBRACE compound_statement_body RBRACE
+compound_statement: LBRACE{enterScope();} compound_statement_body RBRACE{departScope();}
 	;
 
 compound_statement_body: 
 	| variable_declaration compound_statement_body
 	| statement compound_statement_body
+	| object_declaration compound_statement_body
+	| return_statement
+	| class_declaration compound_statement_body
+	| ID_TOK{
+
+	}
+	| error SEMICOLON{
+		/*printf("compound_statement_body's yyerrok\n");*/
+		yyerrok;
+	}
 	;
 
+object_declaration: ID_TOK ID_TOK{/*printf("insert ID object_declaration: %s\n", $2);*/insert($2);} end_of_line /*第一個是class第二個是variable，再看要不要判斷*/
+	| ID_TOK ID_TOK{/*printf("insert ID object_declaration: %s\n", $2);*/insert($2);} ASSIGN NEW ID_TOK LPAREN RPAREN end_of_line
+	{
+		if(strcmp($1, $6))
+		{
+			printf("invalid object declaration.\n");
+		}
+	}
 
 simple_statement: name ASSIGN expression SEMICOLON
-	| PRINT LPAREN expression RPAREN SEMICOLON
-	| READ LPAREN name RPAREN SEMICOLON
-	| expression SEMICOLON
+	| PRINT LPAREN expression RPAREN end_of_line
+	| READ LPAREN name RPAREN end_of_line
+	| expression end_of_line
 	| SEMICOLON
+	
+	
 	;
 
 name: ID_TOK
-	| ID_TOK DOT ID_TOK
+	| field_or_array_item
 	;
+
+field_or_array_item: ID_TOK DOT ID_TOK
+	| array_item
+	;
+
+array_item: ID_TOK LBRACKET INT_LIT RBRACKET
+	| ID_TOK LBRACKET ID_TOK RBRACKET // ID check whether int?
+
+const_expr: const_term
+	| const_expr ADD const_term
+	| const_expr MINUS const_term
+    ;
+
+const_term: const_factor
+	| const_term MUL const_factor
+	| const_term DIV const_factor
+	;
+
+const_factor:INT_LIT
+    | FLOAT_LIT
+    | STRING_LIT
+    | TRUE
+    | FALSE
+	| ID_TOK
+	| method_invocation
+	
+
+
 
 expression: term
 	| expression ADD term
@@ -215,11 +301,18 @@ term: factor
 	;
 
 factor: ID_TOK
-	| const_expr
+	| INT_LIT
+    | FLOAT_LIT
+    | STRING_LIT
+    | TRUE
+    | FALSE
 	| LPAREN expression RPAREN
-	| prefixOP ID_TOK
-	| ID_TOK postfixOP
+	| prefixOP name
+	| name postfixOP
+	| INT_LIT postfixOP
 	| method_invocation
+	| ID_TOK DOT ID_TOK
+	| array_item
 	;
 
 prefixOP: INC
@@ -245,12 +338,22 @@ arg_list
     | arg_list COMMA expression
     ;
 
-conditional_statement: IF LPAREN boolean_expr RPAREN if_else_loop_statement
+
+
+conditional_statement: IF LPAREN boolean_expr RPAREN if_else_loop_statement 
+		%prec LOWER_THAN_ELSE
 	| IF LPAREN boolean_expr RPAREN if_else_loop_statement else
+	| IF LPAREN error RPAREN
+	{
+		yyerror("Invalid Boolean Expression");
+		yyerrok;
+	}
 	;
 
 else: ELSE if_else_loop_statement
+	| ELSE conditional_statement
 	;
+
 
 boolean_expr: expression infixOP expression
 	;
@@ -272,6 +375,10 @@ loop_statement: while
 	;
 
 while: WHILE LPAREN boolean_expr RPAREN if_else_loop_statement
+	| error RPAREN{
+		yyerror("Invalid Boolean Expression");
+		yyerrok;
+	}
 	;
 
 for: FOR LPAREN forInitOpt SEMICOLON boolean_expr SEMICOLON forUpdateOpt RPAREN if_else_loop_statement
@@ -283,7 +390,7 @@ forInitOpt
     ;
 
 init_item
-    : ID_TOK ASSIGN expression
+    : name ASSIGN expression
     | INT ID_TOK ASSIGN expression   /* 供 int i=0 這種 */
     ;
 
@@ -292,8 +399,8 @@ init_list
     | init_list COMMA init_item
     ;
 
-forUpdateOpt: ID_TOK INC
-	| ID_TOK DEC
+forUpdateOpt: name INC
+	| name DEC
 	;
 
 return_statement: RETURN expression SEMICOLON
@@ -302,12 +409,15 @@ return_statement: RETURN expression SEMICOLON
 
 %%
 int main(){
+	create();
     yyparse();
     return 0;
 }
 
-void yyerror() {
-	  printf("syntax error at line %d\n", lineCount+1);
+void yyerror(const char* str) {
+	if(strcmp(str, "syntax error"))
+	  printf("syntax error at line %d, char %d: %s\n", lineCount+1, charCount ,str);
+
 };
 
 void create()
@@ -320,6 +430,19 @@ void create()
 
 int lookup(char* s)
 {
+	if(top >= 0)
+	{
+		int start_order = idStack[top];
+		for(int i=0;i<MAXSIZE;i++)
+		{
+			if(table[i].order >= start_order && !strcmp(s, table[i].ID))
+				return 1;
+		}
+	}
+	
+	return -1;
+
+	/*
 	int index = (int)s[0]*80;
 	int startIndex = index;
 	int notFound = 1;
@@ -342,13 +465,17 @@ int lookup(char* s)
 		return index;
 	else
 		return -1;
+	*/
 }
 
 void insert(char* s)
 {
 	int isInserted = lookup(s);
 	if(isInserted != -1)
+	{
+		yyerror("duplicated identifier in the current scope.");
 		return;
+	}
 	int index = hashFunction_linear(s);
 	if(previousIndex != -1)
 	{
@@ -368,6 +495,7 @@ void insert(char* s)
 	table[index] = _id;
 
 	idCount++;
+	
 }
 
 void dump()
@@ -394,4 +522,32 @@ int hashFunction_linear(char *s)
 			hashValue--;
 	}
 	return hashValue;
+}
+
+
+void enterScope()
+{
+	/*printf("enterScope: top = %d\n", top);*/
+    if (top == MAXSIZE_STACK-1) {
+        fprintf(stderr, "scope too deep\n");
+        exit(1);
+    }
+    idStack[++top] = idCount;
+}
+void departScope()
+{
+	//printf("departScope: top = %d\n", top);
+	
+	int old_count = idStack[top--];
+    while (idCount > old_count) {
+        for (int i = 0; i < MAXSIZE; i++) {
+            if (table[i].order == idCount-1) {
+				//printf("delete the ID: %s\n", table[i].ID);
+                table[i] = emptyID;
+                break;
+            }
+        }
+        idCount--;
+    }
+	//dump();
 }

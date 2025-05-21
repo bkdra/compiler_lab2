@@ -4,7 +4,7 @@
 
 int main()
 {
-    char test[100] = "";
-    if(!strlen(test))
-    printf("length: %d\n", strlen(test));
+    char a[100] = "hello";
+    char b[100] = "hello";
+    printf("%d", strcmp(a, b));
 }

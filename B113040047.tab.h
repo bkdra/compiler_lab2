@@ -121,10 +121,12 @@ extern int yydebug;
     INT_LIT = 322,                 /* INT_LIT  */
     FLOAT_LIT = 323,               /* FLOAT_LIT  */
     STRING_LIT = 324,              /* STRING_LIT  */
-    ID_TOK = 325,                  /* ID_TOK  */
-    ABSTRACT = 326,                /* ABSTRACT  */
-    DOT = 327,                     /* DOT  */
-    READ = 328                     /* READ  */
+    ABSTRACT = 325,                /* ABSTRACT  */
+    DOT = 326,                     /* DOT  */
+    READ = 327,                    /* READ  */
+    CHAR = 328,                    /* CHAR  */
+    ID_TOK = 329,                  /* ID_TOK  */
+    LOWER_THAN_ELSE = 330          /* LOWER_THAN_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -133,12 +135,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 30 "B113040047.y"
+#line 40 "B113040047.y"
 
     float floatVal;
     int intVal;
+	char* stringVal;
 
-#line 142 "B113040047.tab.h"
+#line 145 "B113040047.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
